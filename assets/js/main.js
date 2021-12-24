@@ -17,18 +17,32 @@ const getMockData = (t) => +t.parentElement
 
 const getPrice = (t, price) => Math.round((price + getMockData(t)) * 100) / 100;
 
+const disabledControls = (t, fn) => {
+  t.disabled = true;
+  contentContainer.removeEventListener('click', fn);
+};
+const enableControls = (t, fn) => {
+  t.disabled = false;
+  contentContainer.addEventListener('click', fn);
+};
 
 const btnClickHandler = (e) => {
   const target = e.target;
   const interval = 2000;
+  let restoreHTML = null;
 
   if (target && target.matches('.item-actions__cart')) {
     incrementCounter();
-
-    const mockData = getMockData(target);
-
+    restoreHTML = target.innerHTML;
     cartPrice = getPrice(target, cartPrice);
-    console.log(cartPrice)
+    target.innerHTML = `Added ${cartPrice.toFixed(2)} $`;
+
+    disabledControls(target, btnClickHandler)
+
+    setTimeout(() => {
+      target.innerHTML = restoreHTML;
+      enableControls(target, btnClickHandler);
+    }, interval);
   };
 };
 
